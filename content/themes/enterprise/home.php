@@ -2,7 +2,7 @@
 /**
  * Home Template
  *
- * This is the home template.  Technically, it is the "posts page" template.  It is used when a visitor is on the 
+ * This is the home template.  Technically, it is the "posts page" template.  It is used when a visitor is on the
  * page assigned to show a site's latest blog posts.
  *
  * @package Enterprise
@@ -16,6 +16,15 @@ get_header(); // Loads the header.php template. ?>
 	<div id="content" class="<?php echo enterprise_get_layout( 'content' ); ?>">
 
 		<?php do_atomic( 'open_content' ); // enterprise_open_content ?>
+
+		<form id="new-project" method="post" enctype="multipart/form-data" class="text-center">
+		    <p><input type="text" name="post_title" value="Sample post title" /></p>
+			<p><input name="reconstruct_original_image" type="file" style="margin:0 auto;"/></p>
+			<p><input name="reconstruct_revised_image" type="file" style="margin:0 auto;"/></p>
+		    <p><button>Submit</button></p>
+		</form>
+
+		<hr>
 
 		<div class="hfeed">
 
@@ -31,7 +40,20 @@ get_header(); // Loads the header.php template. ?>
 
 						<?php do_atomic( 'open_entry' ); // enterprise_open_entry ?>
 
-						<?php if ( current_theme_supports( 'get-the-image' ) ) get_the_image( array( 'meta_key' => 'Thumbnail', 'size' => 'thumbnail' ) ); ?>
+<?php
+
+$reconstruct_original_image_id = get_post_meta( get_the_ID(), '_reconstruct_original_image', true );
+$reconstruct_revised_image_id = get_post_meta( get_the_ID(), '_reconstruct_revised_image', true );
+
+$original_image = wp_get_attachment_image_src( $reconstruct_original_image_id, 'large' );
+$revised_image = wp_get_attachment_image_src( $reconstruct_revised_image_id, 'large' );
+
+ ?>
+
+<div class="before-after">
+ <div><img alt="before" src="<?php echo $original_image[0]; ?>" width="<?php echo $original_image[1]; ?>" height="<?php echo $original_image[2]; ?>"></div>
+ <div><img alt="after" src="<?php echo $revised_image[0]; ?>" width="<?php echo $revised_image[1]; ?>" height="<?php echo $revised_image[2]; ?>"></div>
+</div>
 
 						<?php echo apply_atomic_shortcode( 'entry_title', '[entry-title]' ); ?>
 

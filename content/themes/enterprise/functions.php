@@ -1,8 +1,8 @@
 <?php
 /**
- * The functions file is used to initialize everything in the theme.  It controls how the theme is loaded and 
- * sets up the supported features, default actions, and default filters.  If making customizations, users 
- * should create a child theme and make changes to its functions.php file (not this one).  Friends don't let 
+ * The functions file is used to initialize everything in the theme.  It controls how the theme is loaded and
+ * sets up the supported features, default actions, and default filters.  If making customizations, users
+ * should create a child theme and make changes to its functions.php file (not this one).  Friends don't let
  * friends modify parent theme files. ;)
  *
  * Child themes should do their setup on the 'after_setup_theme' hook with a priority of 11 if they want to
@@ -39,7 +39,7 @@ function enterprise_theme_setup() {
 
 	/* Enables styling of the visual editor with editor-style.css to match the theme style. */
 	add_editor_style();
-	
+
 	/* Add theme support for core framework features. */
 	add_theme_support( 'hybrid-core-menus', array( 'primary', 'secondary', 'subsidiary' ) );
 	add_theme_support( 'hybrid-core-sidebars', array( 'primary', 'secondary', 'subsidiary', 'header', 'before-content', 'after-content', 'after-singular' ) );
@@ -65,13 +65,15 @@ function enterprise_theme_setup() {
 
 	/* Embed width/height defaults. */
 	add_filter( 'embed_defaults', 'enterprise_embed_defaults' );
-	
+
 	/* Reconfigure some WordPress settings to work with Bootstrap. */
 	add_action( 'init', 'enterprise_bootstrap_setup' );
 
 	/* Filter the sidebar widgets. */
 	add_filter( 'sidebars_widgets', 'enterprise_disable_sidebars' );
 	add_action( 'template_redirect', 'enterprise_one_column' );
+
+	add_action('pre_get_posts','reconstruct_include_projects');
 
 	/* Set the content width. */
 	hybrid_set_content_width( 870 );
@@ -85,20 +87,30 @@ function enterprise_theme_setup() {
 function enterprise_enqueue_scripts() {
 
 	// Queue CSS
+	wp_enqueue_style( 'fonts',		'http://fonts.googleapis.com/css?family=Raleway:400,300,100,600' );
 	wp_enqueue_style( 'style',		trailingslashit( get_stylesheet_directory_uri() ) . 'style.less' );
 
 	// Queue JS
 	wp_enqueue_script( 'modernizr',	trailingslashit( get_stylesheet_directory_uri() ) . 'js/vendor/modernizr-2.6.2.min.js' );
 	wp_enqueue_script( 'respond',	trailingslashit( get_stylesheet_directory_uri() ) . 'js/vendor/respond.min.js' );
+	wp_enqueue_script( 'jquery' );
+	wp_enqueue_script( 'jquery-ui-core' );
+	wp_enqueue_script( 'jquery-ui-draggable' );
+	wp_enqueue_script( 'beforeafter',	trailingslashit( get_stylesheet_directory_uri() ) . 'js/beforeafter/jquery.beforeafter-1.4.min.js', array( 'jquery' ), false, true );
 	wp_enqueue_script( 'bootstrap',	trailingslashit( get_stylesheet_directory_uri() ) . 'js/vendor/bootstrap.min.js', array( 'jquery' ), false, true );
 	wp_enqueue_script( 'app',		trailingslashit( get_stylesheet_directory_uri() ) . 'js/app.js', array( 'jquery' ), false, true );
 
 }
 
+function reconstruct_include_projects($query) {
+  if ( !is_admin() && $query->is_main_query() ) {
+      $query->set('post_type', array( 'post', 'project' ) );
+  }
+}
 
 /**
  * Function for deciding which pages should have a one-column layout.
- * 
+ *
  * If the Primary and Secondary sidebars aren't being used, make the
  * page one column.
  *
@@ -123,7 +135,7 @@ function enterprise_theme_layout_one_column( $layout ) {
 }
 
 function enterprise_get_layout( $id = '' ) {
-	
+
 	$layout = theme_layouts_get_layout();
 
 	if ( !empty($id) ) {
@@ -157,7 +169,7 @@ function enterprise_get_layout( $id = '' ) {
 			return false;
 		}
 	}
-	
+
 	return $output;
 }
 
@@ -207,7 +219,7 @@ function enterprise_embed_defaults( $args ) {
 }
 
 function enterprise_bootstrap_setup(){
-	
+
 	/**
 	 * Class Name: twitter_bootstrap_nav_walker
 	 * GitHub URI: https://github.com/twittem/wp-bootstrap-navwalker
@@ -217,7 +229,7 @@ function enterprise_bootstrap_setup(){
 	 * Licence: WTFPL 2.0 (http://sam.zoy.org/wtfpl/COPYING)
 	 */
 	class twitter_bootstrap_nav_walker extends Walker_Nav_Menu {
-	
+
 		/**
 		 * @see Walker::start_lvl()
 		 * @since 3.0.0
@@ -227,9 +239,9 @@ function enterprise_bootstrap_setup(){
 		 */
 		function start_lvl( &$output, $depth ) {
 			$indent = str_repeat( "\t", $depth );
-			$output	   .= "\n$indent<ul class=\"dropdown-menu\">\n";		
+			$output	   .= "\n$indent<ul class=\"dropdown-menu\">\n";
 		}
-	
+
 		/**
 		 * @see Walker::start_el()
 		 * @since 3.0.0
@@ -240,56 +252,56 @@ function enterprise_bootstrap_setup(){
 		 * @param int $current_page Menu item ID.
 		 * @param object $args
 		 */
-	
+
 		function start_el( &$output, $item, $depth = 0, $args = array(), $id = 0 ) {
 			global $wp_query;
 			$indent = ( $depth ) ? str_repeat( "\t", $depth ) : '';
-	
+
 			if (strcasecmp($item->title, 'divider')) {
 				$class_names = $value = '';
 				$classes = empty( $item->classes ) ? array() : (array) $item->classes;
 				$classes[] = ($item->current) ? 'active' : '';
 				$classes[] = 'menu-item-' . $item->ID;
 				$class_names = join( ' ', apply_filters( 'nav_menu_css_class', array_filter( $classes ), $item, $args ) );
-	
+
 				if ($args->has_children && $depth > 0) {
 					$class_names .= ' dropdown-submenu';
 				} else if($args->has_children && $depth === 0) {
 					$class_names .= ' dropdown';
 				}
-	
+
 				$class_names = $class_names ? ' class="' . esc_attr( $class_names ) . '"' : '';
-	
+
 				$id = apply_filters( 'nav_menu_item_id', 'menu-item-'. $item->ID, $item, $args );
 				$id = $id ? ' id="' . esc_attr( $id ) . '"' : '';
-	
+
 				$output .= $indent . '<li' . $id . $value . $class_names .'>';
-	
+
 				$attributes  = ! empty( $item->attr_title ) ? ' title="'  . esc_attr( $item->attr_title ) .'"' : '';
 				$attributes .= ! empty( $item->target )     ? ' target="' . esc_attr( $item->target     ) .'"' : '';
 				$attributes .= ! empty( $item->xfn )        ? ' rel="'    . esc_attr( $item->xfn        ) .'"' : '';
 				$attributes .= ! empty( $item->url )        ? ' href="'   . esc_attr( $item->url        ) .'"' : '';
 				$attributes .= ($args->has_children) 	    ? ' data-toggle="dropdown" data-target="#" class="dropdown-toggle"' : '';
-	
+
 				$item_output = $args->before;
 				$item_output .= '<a'. $attributes .'>';
 				$item_output .= $args->link_before . apply_filters( 'the_title', $item->title, $item->ID ) . $args->link_after;
 				$item_output .= ($args->has_children) ? ' <span class="caret"></span></a>' : '</a>';
 				$item_output .= $args->after;
-	
+
 				$output .= apply_filters( 'walker_nav_menu_start_el', $item_output, $item, $depth, $args );
 			} else {
 				$output .= $indent . '<li class="divider"></li>';
 			}
 		}
-	
-	
+
+
 		/**
 		 * Traverse elements to create list from elements.
 		 *
 		 * Display one element if the element doesn't have any children otherwise,
 		 * display the element and its children. Will only traverse up to the max
-		 * depth and no ignore elements under that depth. 
+		 * depth and no ignore elements under that depth.
 		 *
 		 * This method shouldn't be called directly, use the walk() method instead.
 		 *
@@ -304,30 +316,30 @@ function enterprise_bootstrap_setup(){
 		 * @param string $output Passed by reference. Used to append additional content.
 		 * @return null Null on failure with no changes to parameters.
 		 */
-	
+
 		function display_element( $element, &$children_elements, $max_depth, $depth=0, $args, &$output ) {
-	
+
 			if ( !$element ) {
 				return;
 			}
-	
+
 			$id_field = $this->db_fields['id'];
-	
+
 			//display this element
-			if ( is_array( $args[0] ) ) 
+			if ( is_array( $args[0] ) )
 				$args[0]['has_children'] = ! empty( $children_elements[$element->$id_field] );
-			else if ( is_object( $args[0] ) ) 
-				$args[0]->has_children = ! empty( $children_elements[$element->$id_field] ); 
+			else if ( is_object( $args[0] ) )
+				$args[0]->has_children = ! empty( $children_elements[$element->$id_field] );
 			$cb_args = array_merge( array(&$output, $element, $depth), $args);
 			call_user_func_array(array(&$this, 'start_el'), $cb_args);
-	
+
 			$id = $element->$id_field;
-	
+
 			// descend only when the depth is right and there are childrens for this element
 			if ( ($max_depth == 0 || $max_depth > $depth+1 ) && isset( $children_elements[$id]) ) {
-	
+
 				foreach( $children_elements[ $id ] as $child ){
-	
+
 					if ( !isset($newlevel) ) {
 						$newlevel = true;
 						//start the child delimiter
@@ -338,13 +350,13 @@ function enterprise_bootstrap_setup(){
 				}
 					unset( $children_elements[ $id ] );
 			}
-	
+
 			if ( isset($newlevel) && $newlevel ){
 				//end the child delimiter
 				$cb_args = array_merge( array(&$output, $depth), $args);
 				call_user_func_array(array(&$this, 'end_lvl'), $cb_args);
 			}
-	
+
 			//end this element
 			$cb_args = array_merge( array(&$output, $element, $depth), $args);
 			call_user_func_array(array(&$this, 'end_el'), $cb_args);
