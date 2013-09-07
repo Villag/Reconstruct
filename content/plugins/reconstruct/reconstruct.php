@@ -71,6 +71,8 @@ function register_cpt_project() {
 */
 function reconstruct_new_project() {
 
+    $current_user = wp_get_current_user();
+
 	$message = array();
 
 	$post_title = $_POST['post_title'];
@@ -78,6 +80,7 @@ function reconstruct_new_project() {
 
 	// Create post object
 	$args = array(
+        'post_author'   => $current_user->ID,
 		'post_type'		=> 'project',
 		'post_title'    => $post_title,
         'post_status'   => 'publish'

@@ -17,29 +17,45 @@
  * Base
  ***********************************************************/
 body {
-  background: #F06B48;
-  color: #fff;
+  background: #E6E2AF;
+  color: #002F2F;
   font: 13px/21px 'Raleway', sans-serif;
 }
 
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: 'Raleway';
+}
+
 a {
-  color: rgba(255,255,255,0.7);
+  color: #046380;
 }
 
 ::-moz-selection {
-    background: #b3d4fc;
+    background: #046380;
     text-shadow: none;
 }
 
 ::selection {
-    background: #b3d4fc;
+    background: #046380;
     text-shadow: none;
+}
+
+.btn-primary {
+  background: #EFECCA;
+  border-color: #EFECCA;
+  color: #A7A37E;
 }
 
 /*
  * Header
  ***********************************************************/
-#header {}
+#header {
+  text-align: center;
+}
+
+#site-description {
+  display: none;
+}
 
 /*
  * Menus
@@ -54,6 +70,32 @@ a {
  * General Content
  ***********************************************************/
 #content {}
+
+.byline {
+
+  .author {
+    float: left;
+  }
+
+  .comments-link {
+    float: right;
+  }
+
+}
+
+.before-after {
+  margin: 0 auto;
+}
+
+#new-project {
+
+  input[type="text"] {
+    font-size: 17px;
+    line-height: 25px;
+    padding: 4px;
+    width: 50%;
+  }
+}
 
 /*
  * Sidebars

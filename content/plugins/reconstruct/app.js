@@ -1,16 +1,5 @@
 jQuery(document).ready(function($) {"use strict";
 
-	$('.before-after').beforeAfter({
-		imagePath : './content/themes/enterprise/js/beforeafter/',
-		animateIntro:true,
-		showFullLinks : true,
-		beforeLinkText: 'Show before image',
-		afterLinkText: 'Show after image',
-		cursor: 'e-resize',
-		enableKeyboard: true,
-		dividerColor: '#f00'
-	});
-
 	$('#new-project').submit(function() {
 		new_project();
 
