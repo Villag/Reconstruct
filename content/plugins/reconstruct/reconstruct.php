@@ -7,9 +7,11 @@ Author: Patrick Daly
 */
 
 add_action( 'init', 'register_cpt_project' );
+add_action( 'wp_enqueue_scripts', 'reconstruct_enqueue_scripts' );
 add_action( 'wp_ajax_new-project', 'reconstruct_new_project' );
 add_action( 'wp_ajax_nopriv_new-project', 'reconstruct_new_project' );
-add_action( 'wp_enqueue_scripts', 'reconstruct_enqueue_scripts' );
+add_action( 'wp_ajax_fork', 'reconstruct_fork' );
+add_action( 'wp_ajax_nopriv_fork', 'reconstruct_fork' );
 
 /**
  * Queue static resources
@@ -268,5 +270,32 @@ function reconstruct_new_project() {
 	echo json_encode( $response );
 
 	die();
+
+}
+
+function reconstruct_fork() {
+
+    $current_user = wp_get_current_user();
+
+    $message = array();
+    $status = '';
+
+    $post_id = $_POST['post_id'];
+
+    $fork = new Fork();
+    $fork->fork( $post_id, $current_user->ID );
+
+    $response = array (
+
+        'status'    => $status,
+        'data'      => array(
+            'message'   => $message
+        )
+
+    );
+
+    echo json_encode( $response );
+
+    die();
 
 }

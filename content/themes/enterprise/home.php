@@ -38,7 +38,7 @@ get_header(); // Loads the header.php template. ?>
 							<div class="clearfix">
 
 								<?php echo apply_atomic_shortcode( 'byline', '<div class="byline">' . __( '[entry-author] [entry-comments-link]', 'enterprise' ) . '</div>' ); ?>
-
+<a href="#" class="fork-project" data-postid="<?php the_ID(); ?>">Fork</a>
 							</div>
 
 						</div><!-- .container -->

@@ -23,6 +23,7 @@ class Fork_Admin {
 		add_action( 'do_meta_boxes', array( $this, 'remove_add_new_button' ), 10, 1 );
 		add_action( 'admin_menu', array( $this, 'remove_add_new_menu_item' ) );
 		add_filter( 'map_meta_cap', array( $this, 'post_new_lockdown' ), 10, 2 );
+		add_filter( 'admin_body_class', array( $this, 'remove_add_new_list_table' ), 10, 1 );
 
 	}
 
@@ -54,12 +55,14 @@ class Fork_Admin {
 		if ( !isset( $_GET['fork'] ) )
 			return;
 
+		check_admin_referer( 'post-forking-fork_' . intval( $_GET['fork'] ) );
+
 		$fork = $this->parent->fork( (int) $_GET['fork'] );
 
 		if ( !$fork )
 			return;
 
-		wp_redirect( admin_url( "post.php?post=$fork&action=edit" ) );
+		wp_safe_redirect( admin_url( "post.php?post=$fork&action=edit" ) );
 		exit();
 
 	}
@@ -72,6 +75,8 @@ class Fork_Admin {
 
 		if ( !isset( $_GET['merge'] ) )
 			return;
+
+		check_admin_referer( 'post-forking-merge_' . intval( $_GET['merge'] ) );
 
 		$this->parent->merge->merge( (int) $_GET['merge'] );
 
@@ -116,16 +121,16 @@ class Fork_Admin {
 		global $post, $post_ID;
 
 		$messages['fork'] = array(
-			1 => __( 'Fork updated.', 'fork' ),
-			2 => __( 'Custom field updated.', 'fork' ),
-			3 => __( 'Custom field deleted.', 'fork' ),
-			4 => __( 'Fork updated.', 'fork' ),
-			5 => isset($_GET['revision']) ? sprintf( __( 'Fork restored to revision from %s', 'fork' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
-			6 => __( 'Fork published. <a href="%s">Download Fork</a>', 'fork' ),
-			7 => __( 'Fork saved.', 'fork' ),
-			8 => __( 'Fork submitted.', 'fork' ),
-			9 => __( 'Fork scheduled for:', 'fork' ),
-			10 => __( 'Fork draft updated.', 'fork' ),
+			1 => __( 'Fork updated.', 'post-forking' ),
+			2 => __( 'Custom field updated.', 'post-forking' ),
+			3 => __( 'Custom field deleted.', 'post-forking' ),
+			4 => __( 'Fork updated.', 'post-forking' ),
+			5 => isset($_GET['revision']) ? sprintf( __( 'Fork restored to revision from %s', 'post-forking' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+			6 => __( 'Fork published. <a href="%s">Download Fork</a>', 'post-forking' ),
+			7 => __( 'Fork saved.', 'post-forking' ),
+			8 => __( 'Fork submitted.', 'post-forking' ),
+			9 => __( 'Fork scheduled for:', 'post-forking' ),
+			10 => __( 'Fork draft updated.', 'post-forking' ),
 		);
 
 		return $messages;
@@ -143,12 +148,13 @@ class Fork_Admin {
 		if ( !in_array( get_current_screen()->post_type, $post_types ) )
 			return;
 
+        $suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min'; 
+
 		//js
-		$suffix = ( WP_DEBUG ) ? '.dev' : '';
 		wp_enqueue_script( 'post-forking', plugins_url( "/js/admin{$suffix}.js", dirname( __FILE__ ) ), 'jquery', $this->parent->version, true );
 
 		//css
-		wp_enqueue_style( 'post-forking', plugins_url( '/css/admin.css', dirname( __FILE__ ) ), null, $this->parent->version );
+		wp_enqueue_style( 'post-forking', plugins_url( "/css/admin{$suffix}.css", dirname( __FILE__ ) ), null, $this->parent->version );
 
 	}
 
@@ -159,13 +165,13 @@ class Fork_Admin {
 	function row_actions( $actions, $post ) {
 
 		if ( post_type_supports( get_post_type( $post ), $this->parent->post_type_support ) ) {
-			$label = ( $this->parent->branches->can_branch ( $post ) ) ? __( 'Create branch', 'fork' ) : __( 'Fork', 'fork' );
-			$actions[] = '<a href="' . admin_url( "?fork={$post->ID}" ) . '">' . $label . '</a>';
+			$label = ( $this->parent->branches->can_branch ( $post ) ) ? __( 'Create branch', 'post-forking' ) : __( 'Fork', 'post-forking' );
+			$actions[] = '<a href="' . wp_nonce_url( admin_url( "?fork={$post->ID}" ), 'post-forking-fork_' . $post->ID ) . '">' . $label . '</a>';
 		}
 
 		if ( Fork::post_type == get_post_type( $post ) ) {
 			$parent = $this->parent->revisions->get_previous_revision( $post );
-			$actions[] = '<a href="' . admin_url( "revision.php?action=diff&left={$parent}&right={$post->ID}" ) . '">' . __( 'Compare', 'fork' ) . '</a>';
+			$actions[] = '<a href="' . admin_url( "revision.php?page=fork-diff&right={$post->ID}" ) . '">' . __( 'Compare', 'post-forking' ) . '</a>';
 		}
 
 		return $actions;
@@ -181,6 +187,8 @@ class Fork_Admin {
 
 		foreach ( array( 'post', 'author', 'action' ) as $var )
 			$$var = ( isset( $_GET[$var] ) ) ? $_GET[$var] : null;
+
+		check_ajax_referer( 'post-forking-' . $action . '_' . $post );
 
 		if ( $action == 'merge' )
 			$result = $this->parent->merge->merge( $post, $author );
@@ -223,6 +231,13 @@ class Fork_Admin {
 
 	}
 
+	/**
+	 * Add admin body class for the forks list table view
+	 */
+	function remove_add_new_list_table( $classes ) {
+		if ( 'edit-fork' == get_current_screen()->id )
+			return $classes .= ' fork-list';
+	}
 
 	/**
 	 * Lock down the post-new page for forks to prevent strange situations

@@ -6,7 +6,48 @@ jQuery(document).ready(function($) {"use strict";
 		return false;
 	});
 
+	$('.fork-project').click(function() {
+		console.log( $(this).data('postid') );
+		fork_project( $(this).data('postid'));
+
+		return false;
+	});
+
 });
+
+function fork_project( post_id ) { "use strict";
+
+    // This does the ajax request
+    jQuery.ajax({
+        url: Reconstruct.ajaxurl,
+        type: 'POST',
+        data: {
+        	action: 'fork',
+        	post_id: post_id
+        },
+		async: false,
+		dataType: 'json'
+	}).done(function(response) {
+		// Success!
+		if( response.status == 'success' ) {
+
+			jQuery('.hfeed').prepend('<img src="' + response.data.reconstruct_original_image_url + '">');
+			jQuery('.hfeed').prepend('<img src="' + response.data.reconstruct_revised_image_url + '">');
+
+		} else
+
+		// Something failed
+		if( response.status == 'error' ) {
+			//jQuery('#feedback-response').addClass('alert-error');
+		}
+
+	}).fail(function(response) {
+
+	}).always(function(response) {
+		console.log(response);
+	});
+
+}
 
 function new_project() { "use strict";
 
