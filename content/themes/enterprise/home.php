@@ -31,26 +31,17 @@ get_header(); // Loads the header.php template. ?>
 
 						<?php do_atomic( 'open_entry' ); // enterprise_open_entry ?>
 
-						<div class="container">
-
-							<?php echo apply_atomic_shortcode( 'entry_title', '[entry-title]' ); ?>
-
-							<div class="clearfix">
-
-								<?php echo apply_atomic_shortcode( 'byline', '<div class="byline">' . __( '[entry-author] [entry-comments-link]', 'enterprise' ) . '</div>' ); ?>
-<a href="#" class="fork-project" data-postid="<?php the_ID(); ?>">Fork</a>
-							</div>
-
-						</div><!-- .container -->
-
 						<?php get_template_part( 'before-after' ); ?>
 
-						<div class="entry-summary">
-							<?php the_excerpt(); ?>
-							<?php wp_link_pages( array( 'before' => '<p class="page-links">' . __( 'Pages:', 'enterprise' ), 'after' => '</p>' ) ); ?>
-						</div><!-- .entry-summary -->
+						<div class="project-bar">
 
-						<?php echo apply_atomic_shortcode( 'entry_meta', '<div class="entry-meta">' . __( '[entry-terms taxonomy="category" before="Posted in "] [entry-terms before="| Tagged "]', 'enterprise' ) . '</div>' ); ?>
+							<?php echo apply_atomic_shortcode( 'entry_title', '[entry-title] by [entry-author]' ); ?>
+
+							<?php echo apply_atomic_shortcode( 'byline', '<div class="byline">' . __( '[entry-comments-link]', 'enterprise' ) . '</div>' ); ?>
+
+							<?php echo apply_atomic_shortcode( 'entry_meta', '<div class="entry-meta">' . __( '[entry-terms taxonomy="category" before="Posted in "] [entry-terms before="| Tagged "]', 'enterprise' ) . '</div>' ); ?>
+
+						</div><!-- .project-bar -->
 
 						<?php do_atomic( 'close_entry' ); // enterprise_close_entry ?>
 

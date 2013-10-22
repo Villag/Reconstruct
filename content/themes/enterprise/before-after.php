@@ -3,8 +3,8 @@
 $reconstruct_original_image_id = get_post_meta( get_the_ID(), '_reconstruct_original_image', true );
 $reconstruct_revised_image_id = get_post_meta( get_the_ID(), '_reconstruct_revised_image', true );
 
-$original_image = wp_get_attachment_image_src( $reconstruct_original_image_id, 'large' );
-$revised_image = wp_get_attachment_image_src( $reconstruct_revised_image_id, 'large' );
+$original_image = wp_get_attachment_image_src( $reconstruct_original_image_id, 'project-full' );
+$revised_image = wp_get_attachment_image_src( $reconstruct_revised_image_id, 'project-full' );
 
 ?>
 
@@ -15,15 +15,22 @@ $revised_image = wp_get_attachment_image_src( $reconstruct_revised_image_id, 'la
 
 <script>
 jQuery(document).ready(function($) {"use strict";
+
 	$('#before-after-<?php echo the_ID(); ?>').beforeAfter({
 		imagePath : './content/themes/enterprise/js/beforeafter/',
 		animateIntro:true,
 		showFullLinks : true,
-		beforeLinkText: 'Show before image',
-		afterLinkText: 'Show after image',
+		beforeLinkText: '<span class="btn btn-default">toggle</span>',
+		afterLinkText: '<span class="btn btn-default hide">toggle</span>',
 		cursor: 'e-resize',
 		enableKeyboard: true,
 		dividerColor: '#f00'
 	});
+	$('#before-after-<?php echo the_ID(); ?> .balinks .btn').click(function(){
+		console.log('clicked');
+		alert('clicked');
+		$('#before-after-<?php echo the_ID(); ?> .balinks a span').toggleClass('hide');
+	});
+
 });
 </script>

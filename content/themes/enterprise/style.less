@@ -17,17 +17,17 @@
  * Base
  ***********************************************************/
 body {
-  background: #E6E2AF;
-  color: #002F2F;
-  font: 13px/21px 'Raleway', sans-serif;
+  background: #222;
+  color: #ccc;
+  font: 13px/21px 'Noto Sans', sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
-  font-family: 'Raleway';
+  font-family: 'Noto Sans';
 }
 
 a {
-  color: #046380;
+  color: #eee;
 }
 
 ::-moz-selection {
@@ -40,17 +40,12 @@ a {
     text-shadow: none;
 }
 
-.btn-primary {
-  background: #EFECCA;
-  border-color: #EFECCA;
-  color: #A7A37E;
-}
-
 /*
  * Header
  ***********************************************************/
 #header {
-  text-align: center;
+  background: #333;
+  border-bottom: 1px solid #fff;
 }
 
 #site-description {
@@ -94,6 +89,42 @@ a {
     line-height: 25px;
     padding: 4px;
     width: 50%;
+  }
+}
+
+.project {
+  position: relative;
+
+  .balinks {
+    position: absolute !important;
+    top: 45%;
+    width: 100% !important;
+
+    .balinks a {
+      font-size: 48px;
+      left: 49%;
+      z-index: 15;
+    }
+
+  }
+
+  .project-bar {
+    background: #000;
+    border-bottom: 1px solid #1ebad6;
+    color: #ccc;
+    padding: 20px;
+
+    a {
+      color: #1ebad6;
+    }
+
+    .entry-title {
+      display: inline;
+    }
+
+    .byline {
+      color: #ccc;
+    }
   }
 }
 
